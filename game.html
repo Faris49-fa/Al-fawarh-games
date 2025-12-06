@@ -3,103 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لعبة النقر</title>
+    <title>لعبة كرة السلة</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.55.2/phaser.min.js"></script>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            direction: rtl;
-            text-align: center;
-            margin-top: 50px;
-        }
-        .game-area {
-            width: 100%;
-            height: 300px;
-            position: relative;
-            background-color: #f0f0f0;
-            border: 2px solid #ccc;
-            margin: 20px auto;
-        }
-        .target {
-            width: 50px;
-            height: 50px;
-            background-color: red;
-            border-radius: 50%;
-            position: absolute;
-            cursor: pointer;
-        }
-        .score {
-            font-size: 20px;
-            margin: 20px;
-        }
-        .timer {
-            font-size: 20px;
-            margin: 20px;
-            color: red;
-        }
-        .game-over {
-            font-size: 30px;
-            margin-top: 20px;
-            color: green;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
         }
     </style>
 </head>
 <body>
-    <h1>لعبة النقر</h1>
-    <p>انقر على الدائرة الحمراء بأسرع ما يمكن لزيادة النقاط!</p>
-    <div class="score">النقاط: <span id="score">0</span></div>
-    <div class="timer">الوقت المتبقي: <span id="timer">30</span> ثانية</div>
-    <div class="game-area" id="gameArea"></div>
-
     <script>
-        let score = 0;
-        let timeLeft = 30;
-        const gameArea = document.getElementById('gameArea');
-        const scoreElement = document.getElementById('score');
-        const timerElement = document.getElementById('timer');
-        const gameOverElement = document.createElement('div');
-        gameOverElement.classList.add('game-over');
+        var config = {
+            type: Phaser.AUTO,
+            width: 800,
+            height: 600,
+            scene: {
+                preload: preload,
+                create: create,
+                update: update
+            }
+        };
 
-        // تحريك الدائرة إلى مكان عشوائي
-        function randomPosition() {
-            const x = Math.random() * (gameArea.offsetWidth - 50);
-            const y = Math.random() * (gameArea.offsetHeight - 50);
-            return { x, y };
+        var player;
+        var basketball;
+        var basket;
+        var score = 0;
+        var scoreText;
+        var timer;
+        var timerText;
+        var timeLeft = 30;  // الوقت بالثواني
+        var gameOver = false;
+
+        var game = new Phaser.Game(config);
+
+        function preload() {
+            this.load.image('player', 'https://examples.phaser.io/assets/sprites/phaser-dude.png');
+            this.load.image('basketball', 'https://examples.phaser.io/assets/sprites/basketball.png');
+            this.load.image('basket', 'https://examples.phaser.io/assets/sprites/basket.png');
         }
 
-        // إنشاء الدائرة التي يجب النقر عليها
-        function createTarget() {
-            const target = document.createElement('div');
-            target.classList.add('target');
-            const { x, y } = randomPosition();
-            target.style.left = `${x}px`;
-            target.style.top = `${y}px`;
-            gameArea.appendChild(target);
+        function create() {
+            // إنشاء اللاعب
+            player = this.physics.add.sprite(100, 500, 'player').setInteractive();
+            player.setCollideWorldBounds(true);
+            player.setBounce(0.2);
+            player.setDrag(0.98);
+            player.setVelocity(0, -500);
 
-            target.addEventListener('click', function() {
-                score++;
-                scoreElement.textContent = `النقاط: ${score}`;
-                gameArea.removeChild(target);
-                createTarget();
+            // إنشاء الكرة
+            basketball = this.physics.add.sprite(400, 300, 'basketball').setInteractive();
+            basketball.setCollideWorldBounds(true);
+            basketball.setBounce(0.5);
+
+            // إنشاء السلة
+            basket = this.physics.add.sprite(700, 150, 'basket').setScale(0.5);
+
+            // تفاعل بين اللاعب والكرة
+            this.physics.add.collider(player, basketball);
+            this.physics.add.collider(basket, basketball);
+
+            // النصوص
+            scoreText = this.add.text(16, 16, 'Score: 0', {
+                fontSize: '32px',
+                fill: '#000'
+            });
+
+            timerText = this.add.text(650, 16, 'Time: 30', {
+                fontSize: '32px',
+                fill: '#000'
+            });
+
+            // البدء في المؤقت
+            timer = this.time.addEvent({
+                delay: 1000, // كل ثانية
+                callback: updateTimer,
+                callbackScope: this,
+                loop: true
             });
         }
 
-        // بدء التوقيت
-        function startTimer() {
-            const timerInterval = setInterval(function() {
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    gameArea.innerHTML = ''; // إيقاف اللعبة
-                    gameOverElement.textContent = `انتهت اللعبة! النقاط: ${score}`;
-                    document.body.appendChild(gameOverElement);
-                } else {
-                    timeLeft--;
-                    timerElement.textContent = `الوقت المتبقي: ${timeLeft} ثانية`;
+        function update() {
+            // تحديث السرعة مع مرور الوقت لزيادة التحدي
+            if (!gameOver) {
+                if (timeLeft > 0) {
+                    basketball.setVelocityX(basketball.body.velocity.x * 1.02); // زيادة السرعة تدريجياً
                 }
-            }, 1000);
+
+                // تحريك اللاعب
+                if (this.input.activePointer.isDown) {
+                    player.x = this.input.x;
+                    player.y = this.input.y;
+                }
+
+                // تسجيل الهدف
+                if (Phaser.Geom.Intersects.RectangleToRectangle(basket.getBounds(), basketball.getBounds())) {
+                    score += 10;
+                    scoreText.setText('Score: ' + score);
+                    basketball.setPosition(400, 300); // إعادة وضع الكرة بعد الهدف
+                }
+            }
         }
 
-        startTimer();
-        createTarget();
+        function updateTimer() {
+            if (timeLeft > 0) {
+                timeLeft--;
+                timerText.setText('Time: ' + timeLeft);
+            } else {
+                gameOver = true;
+                timerText.setText('Game Over!');
+            }
+        }
     </script>
 </body>
 </html>
