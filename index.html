@@ -12,6 +12,7 @@
             padding: 0;
             background-color: #000000; /* خلفية سوداء */
             color: #fff; /* نص أبيض */
+            font-size: 16px; /* تصغير حجم الخط */
         }
         header {
             background-color: #333333; /* أسود مع تدرج */
@@ -22,7 +23,7 @@
         }
         header h1 {
             margin: 0;
-            font-size: 3em;
+            font-size: 2.5em; /* تصغير حجم العنوان */
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 3px;
@@ -37,7 +38,7 @@
         .link {
             color: #ff4081; /* وردي لامع */
             text-decoration: none;
-            font-size: 1.5em;
+            font-size: 1.3em; /* تصغير حجم الخط في الروابط */
             font-weight: bold;
         }
         .link:hover {
@@ -55,25 +56,15 @@
         }
         footer p {
             margin: 0;
-            font-size: 1.1em;
+            font-size: 1.1em; /* تصغير حجم الخط في التذييل */
         }
         footer a {
             color: white;
             text-decoration: none;
-            font-size: 1.1em;
+            font-size: 1.1em; /* تصغير حجم الخط في الروابط بالتذييل */
         }
         footer a:hover {
             text-decoration: underline;
-        }
-        .image-container {
-            text-align: center;
-            margin-top: 40px;
-        }
-        .image-container img {
-            width: 70%;
-            max-width: 600px;
-            border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
         }
     </style>
 </head>
@@ -98,11 +89,8 @@
 
         <p><a href="about.html" class="link">معلومات عن المشروع</a></p>
 
-        <div class="image-container">
-            <a href="game.html">
-                <img src="assets/your-game-image.jpg" alt="اللعبة" />
-            </a>
-        </div>
+        <!-- استبدال كلمة "لعبة" بكلمة "تحقق من فهمك" -->
+        <p><a href="quiz.html" class="link">تحقق من فهمك</a></p>
     </main>
     <footer>
         <p><a href="about.html">ثالث ثانوي أ</a></p>
