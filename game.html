@@ -29,6 +29,7 @@
         .question {
             font-size: 1.5em;
             margin-bottom: 20px;
+            color: white; /* تغيير لون السؤال إلى الأبيض */
         }
         .options {
             margin-top: 20px;
@@ -107,6 +108,7 @@
         ];
 
         let currentQuestionIndex = 0;
+        let score = 0; // حفظ النتيجة
 
         // عرض السؤال الحالي
         function displayQuestion() {
@@ -127,6 +129,7 @@
             const question = questions[currentQuestionIndex];
             const result = document.getElementById('result');
             if (selectedAnswer === question.correctAnswer) {
+                score++; // إضافة درجة إذا كانت الإجابة صحيحة
                 result.textContent = "إجابة صحيحة!";
                 result.style.color = "green";
             } else {
@@ -140,7 +143,7 @@
                     displayQuestion();
                     result.textContent = ''; // إخفاء النتيجة بعد الانتقال
                 } else {
-                    result.textContent = 'لقد انتهيت من جميع الأسئلة!';
+                    result.textContent = `لقد انتهيت من جميع الأسئلة! نتيجتك هي ${score} من 5`;
                     result.style.color = "blue";
                 }
             }, 2000);
